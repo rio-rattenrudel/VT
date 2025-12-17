@@ -3850,3 +3850,11 @@ msgstr "Число полутонов для транспонирования: �
 msgid "Select module for Turbo Sound mode"
 msgstr "Выберите модуль для режима Turbo Sound"
 
+#: toptionsdlg.cbaymidconsole.caption
+msgid "Enable AYMID console"
+msgstr "Включить консоль AYMID"
+
+#: toptionsdlg.cbaymidprotocol.caption
+msgid "Use AYMID hardware protocol"
+msgstr "Используйте протокол AYMID"
+

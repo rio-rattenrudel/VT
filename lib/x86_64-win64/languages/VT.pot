@@ -3851,3 +3851,11 @@ msgstr ""
 msgid "Select module for Turbo Sound mode"
 msgstr ""
 
+#: toptionsdlg.cbaymidconsole.caption
+msgid "Enable AYMID console"
+msgstr ""
+
+#: toptionsdlg.cbaymidprotocol.caption
+msgid "Use AYMID hardware protocol"
+msgstr ""
+
