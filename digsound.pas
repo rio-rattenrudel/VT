@@ -34,6 +34,8 @@ type
    );
 
 function digsound_geterrortext(ErrorNumber: integer): string;
+function digsound_getvolume(Device: integer): DWORD;
+procedure digsound_setvolume(Device: integer; Value: DWORD);
 procedure digsound_getdevices(devices: TStrings);
 function digsound_open(Device, Channels, SampleRate, Bits, NumberOfBuffers,
  OneBufferLength_ms: integer; BufferDoneEvent: boolean): integer;
@@ -142,6 +144,17 @@ begin
    Result := digsound_errors[ErrorNumber]
  else
    Result := 'Unknown error';
+end;
+
+function digsound_getvolume(Device: integer): DWORD;
+begin
+  //if Device >= Length(device_list) then Exit;
+  WaveOutGetVolume(Device - 1, @Result);
+end;
+
+procedure digsound_setvolume(Device: integer; Value: DWORD);
+begin
+  WaveOutSetVolume(Device - 1, Value);
 end;
 
 procedure digsound_getdevices(devices: TStrings);

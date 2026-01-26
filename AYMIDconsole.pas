@@ -39,7 +39,7 @@ procedure OutputAYMID(mask,msb:uint16; data:PArray0OfByte; length:integer);
 implementation
 
 uses
- crt, AY;
+ digsoundbuf, crt, AY;
 
 
 procedure Color(code: byte);
@@ -200,22 +200,22 @@ end;
 procedure OutputAYRegister;
 begin
  // 16 Reg Debugger
- WriteLn(IntToHex(SoundChip[0].RegisterAY.Index[0]) + ' ' + 
-        IntToHex(SoundChip[0].RegisterAY.Index[1]) + ' ' +
-        IntToHex(SoundChip[0].RegisterAY.Index[2]) + ' ' +
-        IntToHex(SoundChip[0].RegisterAY.Index[3]) + ' ' +
-        IntToHex(SoundChip[0].RegisterAY.Index[4]) + ' ' +
-        IntToHex(SoundChip[0].RegisterAY.Index[5]) + ' ' +
-        IntToHex(SoundChip[0].RegisterAY.Index[6]) + ' ' +
-        IntToHex(SoundChip[0].RegisterAY.Index[7]) + ' ' +
-        IntToHex(SoundChip[0].RegisterAY.Index[8]) + ' ' +
-        IntToHex(SoundChip[0].RegisterAY.Index[9]) + ' ' +
-        IntToHex(SoundChip[0].RegisterAY.Index[10]) + ' ' +
-        IntToHex(SoundChip[0].RegisterAY.Index[11]) + ' ' +
-        IntToHex(SoundChip[0].RegisterAY.Index[12]) + ' ' +
-        IntToHex(SoundChip[0].RegisterAY.Index[13]) + ' ' +
-        IntToHex(SoundChip[0].RegisterAY.Index[14]) + ' ' +
-        IntToHex(SoundChip[0].RegisterAY.Index[15]));
+ WriteLn(IntToHex(PlaybackBufferMaker.Players[0]^.SoundChip.RegisterAY.Index[0]) + ' ' + 
+        IntToHex(PlaybackBufferMaker.Players[0]^.SoundChip.RegisterAY.Index[1]) + ' ' +
+        IntToHex(PlaybackBufferMaker.Players[0]^.SoundChip.RegisterAY.Index[2]) + ' ' +
+        IntToHex(PlaybackBufferMaker.Players[0]^.SoundChip.RegisterAY.Index[3]) + ' ' +
+        IntToHex(PlaybackBufferMaker.Players[0]^.SoundChip.RegisterAY.Index[4]) + ' ' +
+        IntToHex(PlaybackBufferMaker.Players[0]^.SoundChip.RegisterAY.Index[5]) + ' ' +
+        IntToHex(PlaybackBufferMaker.Players[0]^.SoundChip.RegisterAY.Index[6]) + ' ' +
+        IntToHex(PlaybackBufferMaker.Players[0]^.SoundChip.RegisterAY.Index[7]) + ' ' +
+        IntToHex(PlaybackBufferMaker.Players[0]^.SoundChip.RegisterAY.Index[8]) + ' ' +
+        IntToHex(PlaybackBufferMaker.Players[0]^.SoundChip.RegisterAY.Index[9]) + ' ' +
+        IntToHex(PlaybackBufferMaker.Players[0]^.SoundChip.RegisterAY.Index[10]) + ' ' +
+        IntToHex(PlaybackBufferMaker.Players[0]^.SoundChip.RegisterAY.Index[11]) + ' ' +
+        IntToHex(PlaybackBufferMaker.Players[0]^.SoundChip.RegisterAY.Index[12]) + ' ' +
+        IntToHex(PlaybackBufferMaker.Players[0]^.SoundChip.RegisterAY.Index[13]) + ' ' +
+        IntToHex(PlaybackBufferMaker.Players[0]^.SoundChip.RegisterAY.Index[14]) + ' ' +
+        IntToHex(PlaybackBufferMaker.Players[0]^.SoundChip.RegisterAY.Index[15]));
 end;
 
 procedure OutputAYMID(mask,msb:uint16; data:PArray0OfByte; length:integer);

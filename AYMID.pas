@@ -22,6 +22,9 @@ interface
 uses
   LCLIntf,Windows,MMSystem,Sysutils,StdCtrls,Classes;
 
+type
+  EMultiMediaError = class(Exception);
+
 var
   regs: array [0..15] of BYTE = ($FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, 0, 0);
 
@@ -38,7 +41,7 @@ var
 implementation
 
 uses
-  MainWin, settings, sometypes, AY, AYMIDconsole;
+  digsoundbuf, options, sometypes, AY, AYMIDconsole;
 
 const
   FALL_ASLEEP_COUNT = 10;
@@ -144,7 +147,7 @@ begin
   end;
 
   for i := 0 to 13 do begin
-    reg := SoundChip[0].RegisterAY.Index[i];
+    reg := PlaybackBufferMaker.Players[0]^.SoundChip.RegisterAY.Index[i];
 
     if reg <> regs[i] then begin  // diff reg
       regs[i] := reg;             // copy reg
@@ -171,7 +174,7 @@ begin
     aymid_thread.data[4] := msb and $7f;
     aymid_thread.data[5] := (msb shr 7) and $7f;
 
-    if UseAYMIDConsole then begin
+    if VTOptions.UseAYMIDConsole then begin
       // instead of raw output:
       // OutputAYMID(mask, msb, @aymid_thread.data, dcc);
 
@@ -239,7 +242,7 @@ begin
     // goto sleep, reduce cpu load
     if keepAwakeCC = 0 then Sleep(1);
 
-    if not IntFlag then continue;
+    if not PlaybackBufferMaker.IntFlag then continue;
     Sendout;
 
     if Terminated then break;

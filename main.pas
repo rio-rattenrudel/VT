@@ -20,7 +20,7 @@ uses
  SysUtils, Classes, Graphics, Forms, Controls, Menus,
  StdCtrls, Dialogs, Buttons, Messages, ExtCtrls, ComCtrls,
  ActnList, ImgList, AY, digsoundcode, digsound, trfuncs, Grids, ChildWin,
- Config, Languages, keys, TypInfo, Types, midikbd;
+ Config, Languages, keys, TypInfo, Types, midikbd, AYMID, AYMIDconsole;
 
 const
  UM_FINALIZEDS = WM_USER + 2;
@@ -598,6 +598,8 @@ type
 
    //open FN (without path) or show error message
    procedure TryOpenDocument(FN: string);
+
+   procedure HandleSysVolume();
  end;
 
 function SwapW(a: word): word; inline;
@@ -834,6 +836,7 @@ begin
      ToggleMidiKbd.Checked := False;
     end;
   end;
+ AYMIDDevice := MidiIn_DevNum + 1;
  UpdateToggleMidiKbdHint;
 end;
 
@@ -2220,6 +2223,8 @@ procedure TMainForm.FormClose(Sender: TObject; var CloseAction: TCloseAction);
 var
  i: integer;
 begin
+ if VTOptions.UseAYMIDHardware then
+  aymidthread_stop;
  digsoundthread_stop;
  SaveOptions;
  MidiInTimer.Enabled := False; //after SaveOptions to save correct state
@@ -2558,7 +2563,13 @@ begin
    else if SampleRate = 96000 then
      SR.ItemIndex := 4
    else if SampleRate = 192000 then
-     SR.ItemIndex := 5;
+     SR.ItemIndex := 5
+   else begin
+    SR.ItemIndex := 6;
+    ESROther.Text := IntToStr(SampleRate);
+   end;
+   CBAymidProtocol.Checked := UseAYMIDHardware;
+   CBAymidConsole.Checked := UseAYMIDConsole;
    BR.ItemIndex := Ord(SampleBit = 16);
    NCh.ItemIndex := Ord(NumberOfChannels = 2);
    Resamp.ItemIndex := Ord(FilterWant);
@@ -2837,6 +2848,8 @@ begin
    Exit;
  if IsPlaying then
   begin
+   if VTOptions.UseAYMIDHardware then
+    aymidthread_stop;
    digsoundthread_stop;
    RestoreControls;
   end;
@@ -2855,6 +2868,10 @@ begin
    RestoreControls;
    Exit;
   end;
+ if VTOptions.UseAYMIDHardware then begin
+  if VTOptions.UseAYMIDConsole then OutputLogo;
+  aymidthread_start;
+ end;
  VisTimer.Enabled := True;
 end;
 
@@ -2868,6 +2885,8 @@ begin
    Exit;
  if IsPlaying then
   begin
+   if VTOptions.UseAYMIDHardware then
+    aymidthread_stop;
    digsoundthread_stop;
    RestoreControls;
   end;
@@ -2880,6 +2899,10 @@ begin
    RestoreControls;
    Exit;
   end;
+ if VTOptions.UseAYMIDHardware then begin
+  if VTOptions.UseAYMIDConsole then OutputLogo;
+  aymidthread_start;
+ end;
  VisTimer.Enabled := True;
 end;
 
@@ -2892,6 +2915,8 @@ begin
    Exit;
  if IsPlaying then
   begin
+   if VTOptions.UseAYMIDHardware then
+    aymidthread_stop;
    digsoundthread_stop;
    RestoreControls;
   end;
@@ -2914,6 +2939,10 @@ begin
    RestoreControls;
    Exit;
   end;
+ if VTOptions.UseAYMIDHardware then begin
+  if VTOptions.UseAYMIDConsole then OutputLogo;
+  aymidthread_start;
+ end;
  VisTimer.Enabled := True;
 end;
 
@@ -2926,6 +2955,8 @@ begin
    Exit;
  if IsPlaying then
   begin
+   if VTOptions.UseAYMIDHardware then
+    aymidthread_stop;
    digsoundthread_stop;
    RestoreControls;
   end;
@@ -2936,6 +2967,8 @@ end;
 procedure TMainForm.StopPlaying;
 begin
  VisTimer.Enabled := False;
+ if VTOptions.UseAYMIDHardware then
+  aymidthread_stop;
  digsoundthread_stop;
  RestoreControls;
 end;
@@ -3189,6 +3222,10 @@ begin
  if ToggleMidiKbd.Checked then
   begin
    ToggleMidiKbd.Tag := MidiIn_DevNum;
+
+   if VTOptions.UseAYMIDHardware then
+    AYMIDDevice := ToggleMidiKbd.Tag + 1;
+
    if ToggleMidiKbd.Tag < 0 then //prevent "deadlock" when manually switching devices
      ToggleMidiKbd.Tag := 0;
   end;
@@ -3549,6 +3586,8 @@ begin
      if s <> '' then
        SaveStr('MidiKbdName', s);
      SaveDW('MidiKbdVol', Ord(ToggleMidiVol.Checked));
+     SaveDW('UseAYMIDHardware', Ord(UseAYMIDHardware));
+     SaveDW('UseAYMIDConsole', Ord(UseAYMIDConsole));
      SaveStr('ModulesFolder', OpenDialogVTM.InitialDir);
      SaveStr('PatternsFolder', PatternsFolder);
      SaveStr('SamplesFolder', SamplesFolder);
@@ -3700,6 +3739,26 @@ begin
    ShowMessage(Mes_CantOpen + ' ' + FN);
 end;
 
+procedure TMainForm.HandleSysVolume();
+{$ifdef Windows}
+var
+ v: DWORD;
+
+begin
+ if VTOptions.UseAYMIDHardware then begin
+   v := digsound_getvolume(digsoundDevice);
+   if v <> 0 then VTOptions.lastV := v;
+   v := 0;
+ end else begin
+  if VTOptions.lastV = 0 then
+    v := digsound_getvolume(digsoundDevice)
+  else v := VTOptions.lastV;
+ end;
+
+ digsound_setvolume(digsoundDevice, v);
+{$endif}
+end;
+
 procedure TMainForm.LoadOptions;
 
  function GetDW(const Nm: string; out Vl: integer): boolean;
@@ -3842,6 +3901,12 @@ begin
        MidiIn_DevName(s);
      if GetDW('MidiKbdVol', v) then
        ToggleMidiVol.Checked := v <> 0;
+     if GetDW('UseAYMIDHardware', v) then
+      UseAYMIDHardware := v <> 0;
+     if GetDW('UseAYMIDConsole', v) then begin
+      UseAYMIDConsole := v <> 0;
+      if UseAYMIDConsole then OpenConsole;
+     end;
      if GetStr('ModulesFolder', s) then
        OpenDialogVTM.InitialDir := s;
      if GetStr('PatternsFolder', s) then

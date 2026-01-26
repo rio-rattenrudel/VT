@@ -13,7 +13,7 @@ object OptionsDlg: TOptionsDlg
   OnShow = FormShow
   Position = poMainFormCenter
   ShowHint = True
-  LCLVersion = '3.0.0.3'
+  LCLVersion = '3.8.0.0'
   object OpsPages: TPageControl
     Left = 0
     Height = 267
@@ -660,7 +660,7 @@ object OptionsDlg: TOptionsDlg
           Left = 51
           Height = 13
           Top = 4
-          Width = 53
+          Width = 52
           BorderSpacing.Left = 2
           Caption = 'Track lines'
           ParentColor = False
@@ -885,7 +885,7 @@ object OptionsDlg: TOptionsDlg
         ChildSizing.ControlsPerLine = 1
         ClientHeight = 46
         ClientWidth = 112
-        ItemIndex = 1
+        ItemIndex = 0
         Items.Strings = (
           'AY-3-8910/12'
           'YM2149F'
@@ -1147,7 +1147,7 @@ object OptionsDlg: TOptionsDlg
           Height = 17
           Hint = 'Check to use for chip emulation and for visual allocation in tracks editor'
           Top = 21
-          Width = 38
+          Width = 39
           Caption = 'ABC'
           TabOrder = 1
           OnClick = RBcaClick
@@ -1161,7 +1161,7 @@ object OptionsDlg: TOptionsDlg
           Height = 17
           Hint = 'Check to use for chip emulation and for visual allocation in tracks editor'
           Top = 38
-          Width = 38
+          Width = 39
           Caption = 'ACB'
           TabOrder = 2
           OnClick = RBcaClick
@@ -1175,7 +1175,7 @@ object OptionsDlg: TOptionsDlg
           Height = 17
           Hint = 'Check to use for chip emulation and for visual allocation in tracks editor'
           Top = 55
-          Width = 38
+          Width = 39
           Caption = 'BAC'
           TabOrder = 3
           OnClick = RBcaClick
@@ -1189,7 +1189,7 @@ object OptionsDlg: TOptionsDlg
           Height = 17
           Hint = 'Check to use for chip emulation and for visual allocation in tracks editor'
           Top = 72
-          Width = 38
+          Width = 39
           Caption = 'BCA'
           TabOrder = 4
           OnClick = RBcaClick
@@ -1203,7 +1203,7 @@ object OptionsDlg: TOptionsDlg
           Height = 17
           Hint = 'Check to use for chip emulation and for visual allocation in tracks editor'
           Top = 89
-          Width = 38
+          Width = 39
           Caption = 'CAB'
           TabOrder = 5
           OnClick = RBcaClick
@@ -1217,7 +1217,7 @@ object OptionsDlg: TOptionsDlg
           Height = 17
           Hint = 'Check to use for chip emulation and for visual allocation in tracks editor'
           Top = 106
-          Width = 38
+          Width = 39
           Caption = 'CBA'
           TabOrder = 6
           OnClick = RBcaClick
@@ -1302,7 +1302,7 @@ object OptionsDlg: TOptionsDlg
         Left = 0
         Height = 185
         Top = 0
-        Width = 107
+        Width = 123
         AutoFill = True
         Caption = 'Sample rate'
         ChildSizing.LeftRightSpacing = 6
@@ -1313,7 +1313,7 @@ object OptionsDlg: TOptionsDlg
         ChildSizing.Layout = cclLeftToRightThenTopToBottom
         ChildSizing.ControlsPerLine = 1
         ClientHeight = 167
-        ClientWidth = 103
+        ClientWidth = 119
         ItemIndex = 2
         Items.Strings = (
           '11025 Hz'
@@ -1322,16 +1322,17 @@ object OptionsDlg: TOptionsDlg
           '48000 Hz'
           '96000 Hz'
           '192000 Hz'
+          'Another'
         )
         OnClick = SRClick
         ParentBackground = False
         TabOrder = 0
       end
       object BR: TRadioGroup
-        Left = 112
+        Left = 128
         Height = 92
         Top = 0
-        Width = 81
+        Width = 65
         AutoFill = True
         Caption = 'Bit rate'
         ChildSizing.LeftRightSpacing = 6
@@ -1342,7 +1343,7 @@ object OptionsDlg: TOptionsDlg
         ChildSizing.Layout = cclLeftToRightThenTopToBottom
         ChildSizing.ControlsPerLine = 1
         ClientHeight = 74
-        ClientWidth = 77
+        ClientWidth = 61
         ItemIndex = 1
         Items.Strings = (
           '8 bit'
@@ -1353,10 +1354,10 @@ object OptionsDlg: TOptionsDlg
         TabOrder = 1
       end
       object NCh: TRadioGroup
-        Left = 112
+        Left = 128
         Height = 92
         Top = 93
-        Width = 81
+        Width = 65
         AutoFill = True
         Caption = 'Channels'
         ChildSizing.LeftRightSpacing = 6
@@ -1367,7 +1368,7 @@ object OptionsDlg: TOptionsDlg
         ChildSizing.Layout = cclLeftToRightThenTopToBottom
         ChildSizing.ControlsPerLine = 1
         ClientHeight = 74
-        ClientWidth = 77
+        ClientWidth = 61
         ItemIndex = 1
         Items.Strings = (
           'Mono'
@@ -1390,7 +1391,7 @@ object OptionsDlg: TOptionsDlg
         object LbBufLn: TLabel
           AnchorSideLeft.Control = LbBufLnCpt
           AnchorSideLeft.Side = asrBottom
-          Left = 78
+          Left = 79
           Height = 13
           Top = 2
           Width = 36
@@ -1421,14 +1422,14 @@ object OptionsDlg: TOptionsDlg
           Left = 6
           Height = 13
           Top = 101
-          Width = 62
+          Width = 61
           Caption = 'Total length'
           ParentColor = False
         end
         object LbTotLn: TLabel
           AnchorSideLeft.Control = LbTotLnCpt
           AnchorSideLeft.Side = asrBottom
-          Left = 72
+          Left = 71
           Height = 13
           Top = 101
           Width = 42
@@ -1444,7 +1445,7 @@ object OptionsDlg: TOptionsDlg
           Left = 6
           Height = 13
           Top = 2
-          Width = 68
+          Width = 69
           Caption = 'Buffer length'
           ParentColor = False
         end
@@ -1506,6 +1507,65 @@ object OptionsDlg: TOptionsDlg
           Style = csDropDownList
           TabOrder = 0
           OnChange = CBDeviceChange
+        end
+      end
+      object ESROther: TEdit
+        AnchorSideLeft.Side = asrBottom
+        AnchorSideTop.Side = asrCenter
+        Left = 72
+        Height = 21
+        Top = 160
+        Width = 48
+        Alignment = taCenter
+        AutoSize = False
+        BorderSpacing.Left = 2
+        BorderSpacing.Right = 4
+        TabOrder = 5
+      end
+      object SBSRAYby8: TSpeedButton
+        AnchorSideLeft.Side = asrCenter
+        AnchorSideTop.Control = ESROther
+        AnchorSideTop.Side = asrBottom
+        Left = 19
+        Height = 23
+        Top = 189
+        Width = 85
+        AutoSize = True
+        BorderSpacing.Top = 8
+        BorderSpacing.Bottom = 8
+        Constraints.MinHeight = 23
+        Constraints.MinWidth = 85
+        Caption = 'AY / 8'
+        OnClick = SBSRAYby8Click
+      end
+      object GBAymid: TGroupBox
+        Left = 128
+        Height = 35
+        Top = 184
+        Width = 320
+        Anchors = [akTop]
+        AutoSize = True
+        Caption = 'AYMID'
+        ClientHeight = 17
+        ClientWidth = 316
+        TabOrder = 6
+        object CBAymidProtocol: TCheckBox
+          Left = 0
+          Height = 17
+          Top = 0
+          Width = 172
+          Caption = 'Use AYMID hardware protocol'
+          TabOrder = 0
+          OnChange = CBAymidProtocolChange
+        end
+        object CBAymidConsole: TCheckBox
+          Left = 184
+          Height = 17
+          Top = 0
+          Width = 132
+          Caption = 'Enable AYMID console'
+          TabOrder = 1
+          OnChange = CBAymidConsoleChange
         end
       end
     end
@@ -1707,7 +1767,7 @@ object OptionsDlg: TOptionsDlg
         Height = 17
         Hint = 'Use LMB instead of RMB to draw amplitude in corresponding area of the sample editor'
         Top = 186
-        Width = 261
+        Width = 262
         Caption = 'Use left mouse button (LMB) to draw amplitude'
         TabOrder = 9
         OnChange = CBLMBtoDrawChange

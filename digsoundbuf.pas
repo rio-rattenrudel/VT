@@ -4,6 +4,8 @@ This is part of Vortex Tracker II project
 Author Sergey Bulba
 E-mail: svbulba@gmail.com
 Support page: http://bulba.untergrund.net/
+
+note: 2025 AYMID additions by rio rattenrudel
 }
 
 unit digsoundbuf;
@@ -77,6 +79,7 @@ type
    procedure Synthesizer_Stereo8(Buf: pointer);
    procedure Synthesizer_Mono16(Buf: pointer);
    procedure Synthesizer_Mono8(Buf: pointer);
+   procedure Synthesizer_AYMID(Buf:pointer);
    procedure SynthesizerZX50(Buf: pointer);
    procedure SetSynthesizer;
 
@@ -521,6 +524,33 @@ begin
  Current_Tik := 0;
 end;
 
+procedure TBufferMaker.Synthesizer_AYMID(Buf: pointer);
+begin
+ repeat
+   if Tick_Counter.Re >= Tik.Re then
+    begin
+     repeat
+       Inc(Tik.Re, integer(Delay_In_Tiks));
+       visualisation_check;
+       Inc(BufferLength);
+       if BufferLength = BufferLengthMax then
+        begin
+         if Current_Tik < Number_Of_Tiks.Hi then
+           IntFlag := True;
+         exit;
+        end
+     until Tick_Counter.Re < Tik.Re; //simple upsampler
+     Dec(Tik.Re, Tick_Counter.Re);
+     Tick_Counter.Re := 0;
+    end;
+
+   Inc(Current_Tik);
+   Inc(Tick_Counter.Hi);
+ until Current_Tik >= Number_Of_Tiks.Hi;
+ Number_Of_Tiks.Hi := 0;
+ Current_Tik := 0;
+end;
+
 procedure TBufferMaker.Reset;
 var
  i: integer;
@@ -618,7 +648,9 @@ end;
 
 procedure TBufferMaker.SetSynthesizer;
 begin
- if VTOptions.NumberOfChannels = 2 then
+ if VTOptions.UseAYMIDHardware then
+  Synthesizer := @Synthesizer_AYMID
+ else if VTOptions.NumberOfChannels = 2 then
   begin
    if VTOptions.SampleBit = 8 then
      Synthesizer := @Synthesizer_Stereo8
@@ -666,6 +698,10 @@ begin
      PlaybackBufferMaker.Tik.Re := Delay_In_Tiks;
      AY_Tiks_In_Interrupt := round(Fr / (VTOptions.Interrupt_Freq / 1000 * 8));
      SetFilter(VTOptions.FilterWant);
+
+     // RIO: Prepare AYMID frequency 
+     if VTOptions.UseAYMIDHardware then Set_Sample_Rate(round(Fr / 8 / 16));
+
     finally
      digsoundloop_release;
     end;

@@ -4,6 +4,8 @@ This is part of Vortex Tracker II project
 Author Sergey Bulba
 E-mail: svbulba@gmail.com
 Support page: http://bulba.untergrund.net/
+
+note: 2025 AYMID additions by rio rattenrudel
 }
 
 unit AY;
@@ -53,14 +55,14 @@ type
  TRegisterAY = packed record
    case integer of
      0: (Index: array[0..15] of byte);
-     1: (TonA, TonB, TonC: word;
-       Noise: byte;
-       Mixer: byte;
-       AmplitudeA, AmplitudeB, AmplitudeC: byte;
-       Envelope: word;
-       EnvType: byte);
- end;
-
+     1: (TonA, TonB, TonC: word;                  // 3x 12bit (lo 8bit fine, hi 4Bit coarse)
+       Noise: byte;                               //     5bit (period ctrl)
+       Mixer: byte;                               //     8bit (aka 'enable') (IOB, IOA, Noise:C, B, A, Ton:C, B, A)
+       AmplitudeA, AmplitudeB, AmplitudeC: byte;  // 3x  5bit (M, L3, L2, L1, L0)
+       Envelope: word;                            //    16bit (lo 8bit fine, hi 8Bit coarse)
+       EnvType: byte);                            //     4bit (aka 'shape/cycle') (CONT, ATT, ALT, HOLD)
+ end;                                             //     8bit IO PortA (unused)
+                                                  //     8bit IO PortB (unused) 
  //Available soundchips
  TChipTypes = (No_Chip, AY_Chip, YM_Chip);
 

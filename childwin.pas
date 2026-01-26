@@ -4,6 +4,8 @@ This is part of Vortex Tracker II project
 Author Sergey Bulba
 E-mail: svbulba@gmail.com
 Support page: http://bulba.untergrund.net/
+
+note: 2025 AYMID additions by rio rattenrudel
 }
 
 unit ChildWin;
@@ -16,7 +18,7 @@ uses
  LCLIntf, LCLType, LCLProc, Classes, Graphics, Forms, Controls, StdCtrls,
  SysUtils, ComCtrls, Grids, Menus, Buttons, ExtCtrls, Dialogs, lazutf8,
  LMessages, Clipbrd, Types, Math, trfuncs, digsound, digsoundcode, AY,
- WinVersion;
+ WinVersion, AYMID, AYMIDconsole;
 
 const
  //editor tabsheet page indexes
@@ -6375,6 +6377,8 @@ begin
 
  if IsPlayingWindow >= 0 then
   begin
+   if VTOptions.UseAYMIDHardware then
+    aymidthread_stop;
    digsoundthread_stop;
    MainForm.RestoreControls;
   end;
@@ -7128,6 +7132,10 @@ begin
   end;
  if not IsPlaying then
    digsoundthread_start2(False); //silent (without error message showing)
+   if VTOptions.UseAYMIDHardware then begin
+    if VTOptions.UseAYMIDConsole then OutputLogo;
+    aymidthread_start;
+   end;
 end;
 
 procedure TChildForm.RestartPlayingPatternLine(Enter: boolean);
@@ -7180,6 +7188,10 @@ begin
      Tracks.ResetSelection;
      Exit;
     end;
+   if VTOptions.UseAYMIDHardware then begin
+    if VTOptions.UseAYMIDConsole then OutputLogo;
+    aymidthread_start;
+   end;
  MainForm.VisTimer.Enabled := True;
 end;
 

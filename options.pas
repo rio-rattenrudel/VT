@@ -4,6 +4,8 @@ This is part of Vortex Tracker II project
 Author Sergey Bulba
 E-mail: svbulba@gmail.com
 Support page: http://bulba.untergrund.net/
+
+note: 2025 AYMID additions by rio rattenrudel
 }
 
 unit options;
@@ -51,6 +53,9 @@ type
    DecTrLines, DecNoise, EnvAsNote, RecalcEnv, BgAllowMIDI: boolean;
    SamAsNote, OrnAsNote, TracksHint, SamHint, OrnHint, SamOrnHLines: boolean;
    NotWarnUndo, LMBToDraw: boolean;
+   UseAYMIDHardware, UseAYMIDConsole: boolean;
+   lastNumberOfBuffers,lastSampleRate,lastBufLen_ms: integer;
+   lastV: DWORD;
    Lang: string;
    {$IFDEF Windows}
    Priority: dword;
@@ -67,6 +72,8 @@ type
    Bevel3: TBevel;
    Bevel4: TBevel;
    BSetDefaults: TButton;
+   CBAymidConsole: TCheckBox;
+   CBAymidProtocol: TCheckBox;
    CBcaBCA: TCheckBox;
    CBcaCAB: TCheckBox;
    CBcaBAC: TCheckBox;
@@ -91,6 +98,8 @@ type
    CBOrnHint: TCheckBox;
    EdNoteTbl: TEdit;
    EdAutStpVal: TEdit;
+   ESROther: TEdit;
+   GBAymid: TGroupBox;
    GBDesign: TGroupBox;
    GBInitParams: TGroupBox;
    ChanSel: TGroupBox;
@@ -116,6 +125,7 @@ type
    RBcaCAB: TRadioButton;
    RBcaCBA: TRadioButton;
    RBcaMono: TRadioButton;
+   SBSRAYby8: TSpeedButton;
    ShGlobalBgEmpty: TShape;
    ShGlobalWorkspace: TShape;
    ShOrnamentsBgBeyondHl: TShape;
@@ -187,6 +197,8 @@ type
    UDNoteTbl: TUpDown;
    UDAutStpVal: TUpDown;
    procedure BDefineShorcutClick(Sender: TObject);
+   procedure CBAymidConsoleChange(Sender: TObject);
+   procedure CBAymidProtocolChange(Sender: TObject);
    procedure CBBgAllowMIDIChange(Sender: TObject);
    procedure CBcaChange(Sender: TObject);
    procedure CBLangEditingDone(Sender: TObject);
@@ -215,6 +227,7 @@ type
    procedure FillKeySources;
    procedure FormCreate(Sender: TObject);
    procedure LoadLanguages;
+   procedure SBSRAYby8Click(Sender: TObject);
    procedure UpdateLang;
    function Get_Language: string;
    procedure IntSelClick(Sender: TObject);
@@ -314,6 +327,7 @@ type
      NewValue: smallint; Direction: TUpDownDirection);
    procedure UDNumLinesChangingEx(Sender: TObject; var AllowChange: boolean;
      NewValue: smallint; Direction: TUpDownDirection);
+    procedure SetSRs;
  private
    { Private declarations }
  public
@@ -333,7 +347,7 @@ implementation
 
 uses
  Main, digsoundcode, digsoundbuf, trfuncs, keys, catchshortcut, nkeypeeker,
- Languages, LCLTranslator, LResources;
+ Languages, LCLTranslator, LResources, AYMID, AYMIDconsole;
 
  {$R *.lfm}
 
@@ -721,6 +735,51 @@ begin
  CatchShortcutOrNoteKey;
 end;
 
+procedure TOptionsDlg.CBAymidProtocolChange(Sender: TObject);
+begin
+ if IsPlaying then exit;
+
+ VTOptions.UseAYMIDHardware := CBAymidProtocol.Checked;
+ if VTOptions.UseAYMIDHardware then begin
+
+  // prevalues
+  VTOptions.lastBufLen_ms := BufLen_ms;
+  VTOptions.lastNumberOfBuffers := NumberOfBuffers;
+  VTOptions.lastSampleRate := VTOptions.SampleRate;
+
+  if NumberOfBuffers < 8 then
+   NumberOfBuffers := 7;
+
+  SetBuffers(20, NumberOfBuffers);
+
+  Set_Sample_Rate(round(VTOptions.AY_Freq / 8 / 16));
+  SetSRs;
+
+  // disable
+  SR.Enabled := False;
+  TBBufLen.Enabled := False;
+ end else begin
+  // restore
+  SetBuffers(VTOptions.lastBufLen_ms, VTOptions.lastNumberOfBuffers);
+  Set_Sample_Rate(VTOptions.lastSampleRate);
+  SetSRs;
+
+  SR.Enabled := True;
+  TBBufLen.Enabled := True;
+ end;
+
+ MainForm.HandleSysVolume();
+ PlaybackBufferMaker.SetSynthesizer;
+end;
+
+procedure TOptionsDlg.CBAymidConsoleChange(Sender: TObject);
+begin
+ if IsPlaying then exit;
+
+ VTOptions.UseAYMIDConsole := CBAymidConsole.Checked;
+ if VTOptions.UseAYMIDConsole then OpenConsole else CloseConsole;
+end;
+
 procedure TOptionsDlg.CBBgAllowMIDIChange(Sender: TObject);
 begin
  VTOptions.BgAllowMIDI := CBBgAllowMIDI.Checked;
@@ -900,6 +959,12 @@ begin
    i := FindNext(SearchRec);
   end;
  FindClose(SearchRec);
+end;
+
+procedure TOptionsDlg.SBSRAYby8Click(Sender: TObject);
+begin
+ Set_Sample_Rate(round(VTOptions.AY_Freq / 8));
+ SetSRs;
 end;
 
 procedure TOptionsDlg.IntSelClick(Sender: TObject);
@@ -1275,6 +1340,7 @@ begin
    3: Set_Sample_Rate(48000);
    4: Set_Sample_Rate(96000);
    5: Set_Sample_Rate(192000);
+   6: if ESROther.Text <> '' then Set_Sample_Rate(StrToInt(ESROther.Text));
   end;
  LbFIRk.Caption := FiltInfo;
 end;
@@ -1301,6 +1367,7 @@ begin
  LbNotice.Visible := True;
  LBChg.Visible := True;
  SelDev.Enabled := False;
+ GBAymid.Enabled := False;
 end;
 
 procedure TOptionsDlg.PlayStops;
@@ -1312,6 +1379,7 @@ begin
  LbNotice.Visible := False;
  LBChg.Visible := False;
  SelDev.Enabled := True;
+ GBAymid.Enabled := True;
 end;
 
 procedure TOptionsDlg.ResampClick(Sender: TObject);
@@ -1344,8 +1412,12 @@ begin
  else
    Exit;
   end;
- if f <> VTOptions.AY_Freq then
+ if f <> VTOptions.AY_Freq then begin
    Set_Chip_Frq(f);
+
+   if VTOptions.UseAYMIDHardware then
+     ESROther.Text := IntToStr(VTOptions.SampleRate);
+ end;
  LbFIRk.Caption := FiltInfo;
 end;
 
@@ -1472,6 +1544,23 @@ begin
  AllowChange := NewValue in [3..DefPatLen];
  if AllowChange then
    VTOptions.TracksNOfLines := NewValue;
+end;
+
+procedure TOptionsDlg.SetSRs;
+begin
+ case VTOptions.SampleRate of
+   192000:  SR.ItemIndex := 5;
+   96000:   SR.ItemIndex := 4;
+   48000:   SR.ItemIndex := 3;
+   44100:   SR.ItemIndex := 2;
+   22050:   SR.ItemIndex := 1;
+   11025:   SR.ItemIndex := 0;
+   else
+    begin
+     ESROther.Text := IntToStr(VTOptions.SampleRate);
+     SR.ItemIndex := 6;
+    end;
+  end;
 end;
 
 end.
