@@ -521,10 +521,10 @@ object OptionsDlg: TOptionsDlg
         object ShGlobalWorkspace: TShape
           AnchorSideLeft.Side = asrBottom
           Cursor = crHandPoint
-          Left = 9
+          Left = 8
           Height = 24
           Hint = 'Workspace background color'
-          Top = 88
+          Top = 25
           Width = 24
           BorderSpacing.Left = 4
           OnMouseDown = ShapeColorMouseDown
@@ -534,10 +534,10 @@ object OptionsDlg: TOptionsDlg
           AnchorSideLeft.Control = ShGlobalWorkspace
           AnchorSideLeft.Side = asrBottom
           Cursor = crHandPoint
-          Left = 41
+          Left = 40
           Height = 24
           Hint = 'Background color for empty spaces'
-          Top = 88
+          Top = 25
           Width = 24
           BorderSpacing.Left = 8
           OnMouseDown = ShapeColorMouseDown
@@ -638,6 +638,66 @@ object OptionsDlg: TOptionsDlg
           BorderSpacing.Top = 8
           OnMouseDown = ShapeColorMouseDown
           OnMouseUp = ShOrnamentsBgBeyondHlMouseUp
+        end
+        object AymidColorButton1: TSpeedButton
+          Tag = 1
+          Left = 10
+          Height = 22
+          Top = 88
+          Width = 23
+          AllowAllUp = True
+          Color = clLime
+          GroupIndex = 1
+          OnClick = AymidColorButtonsClick
+        end
+        object AymidColorButton0: TSpeedButton
+          Left = 9
+          Height = 22
+          Top = 112
+          Width = 23
+          AllowAllUp = True
+          Color = clAqua
+          Down = True
+          GroupIndex = 1
+          OnClick = AymidColorButtonsClick
+        end
+        object AymidColorButton2: TSpeedButton
+          Tag = 2
+          Left = 40
+          Height = 22
+          Top = 88
+          Width = 23
+          AllowAllUp = True
+          Color = clYellow
+          GroupIndex = 1
+          OnClick = AymidColorButtonsClick
+        end
+        object AymidColorButton3: TSpeedButton
+          Tag = 3
+          Left = 41
+          Height = 22
+          Top = 112
+          Width = 23
+          AllowAllUp = True
+          Color = clFuchsia
+          GroupIndex = 1
+          OnClick = AymidColorButtonsClick
+        end
+        object Label1: TLabel
+          Left = 8
+          Height = 17
+          Top = 64
+          Width = 70
+          Alignment = taCenter
+          Anchors = [akTop, akLeft, akRight]
+          Caption = 'AYMID'
+          Font.CharSet = ANSI_CHARSET
+          Font.Color = clBlack
+          Font.Height = -13
+          Font.Pitch = fpVariable
+          Font.Quality = fqDraft
+          Font.Style = [fsBold]
+          ParentFont = False
         end
       end
       object GBInitParams: TGroupBox

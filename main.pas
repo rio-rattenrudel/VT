@@ -2570,6 +2570,12 @@ begin
    end;
    CBAymidProtocol.Checked := UseAYMIDHardware;
    CBAymidConsole.Checked := UseAYMIDConsole;
+   case AymidColorTag of
+     0: AymidColorButton0.Down := True;
+     1: AymidColorButton1.Down := True;
+     2: AymidColorButton2.Down := True;
+     3: AymidColorButton3.Down := True;
+   end;
    BR.ItemIndex := Ord(SampleBit = 16);
    NCh.ItemIndex := Ord(NumberOfChannels = 2);
    Resamp.ItemIndex := Ord(FilterWant);
@@ -3588,6 +3594,7 @@ begin
      SaveDW('MidiKbdVol', Ord(ToggleMidiVol.Checked));
      SaveDW('UseAYMIDHardware', Ord(UseAYMIDHardware));
      SaveDW('UseAYMIDConsole', Ord(UseAYMIDConsole));
+     SaveDW('AymidColorTag', AymidColorTag);
      SaveStr('ModulesFolder', OpenDialogVTM.InitialDir);
      SaveStr('PatternsFolder', PatternsFolder);
      SaveStr('SamplesFolder', SamplesFolder);
@@ -3907,6 +3914,12 @@ begin
       UseAYMIDConsole := v <> 0;
       if UseAYMIDConsole then OpenConsole;
      end;
+     if GetDW('AymidColorTag', v) then begin
+       if v <> AymidColorTag then begin
+        SetDataColorByTag(v);
+        AymidColorTag := v;
+       end;
+     end;  
      if GetStr('ModulesFolder', s) then
        OpenDialogVTM.InitialDir := s;
      if GetStr('PatternsFolder', s) then

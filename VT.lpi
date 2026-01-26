@@ -136,7 +136,7 @@
       <AutoIncrementBuild Value="True"/>
       <MajorVersionNr Value="1"/>
       <RevisionNr Value="32"/>
-      <BuildNr Value="512"/>
+      <BuildNr Value="516"/>
       <StringTable CompanyName="Sergey Bulba" FileDescription="ZX Spectrum YM2149F/AY-3-8910/12 Music Editor" InternalName="VT" LegalCopyright="(c)2000-2024 S.V.Bulba" OriginalFilename="VT.exe" ProductName="Vortex Tracker II" ProductVersion="1.0"/>
     </VersionInfo>
     <BuildModes>

@@ -18,7 +18,7 @@ uses
  LCLIntf, LCLType, LCLProc, Classes, Graphics, Forms, Controls, StdCtrls,
  SysUtils, ComCtrls, Grids, Menus, Buttons, ExtCtrls, Dialogs, lazutf8,
  LMessages, Clipbrd, Types, Math, trfuncs, digsound, digsoundcode, AY,
- WinVersion, AYMID, AYMIDconsole;
+ WinVersion, AYMID, AYMIDconsole, guitypes;
 
 const
  //editor tabsheet page indexes

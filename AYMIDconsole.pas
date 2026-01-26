@@ -2,7 +2,7 @@
 AYMIDconsole.pas - AYMID console for displaying nerdy outputs
 -------------------------------------------------------------
 
-(c)2025 by rio rattenrudel
+(c)2026 by rio rattenrudel
 
   The sound chip frequency of AY_Emul must match
   your hardware (1.77 / 2 MHz), which can be set
@@ -24,10 +24,11 @@ uses
  Windows, Classes, SysUtils, sometypes;
 
 var
-  hIn :     THandle;
-  hOut:     THandle;
-  sbInfo:   CONSOLE_SCREEN_BUFFER_INFO;
-  colored:  Boolean = False;
+  hIn :       THandle;
+  hOut:       THandle;
+  sbInfo:     CONSOLE_SCREEN_BUFFER_INFO;
+  colored:    Boolean = False;
+  dataColor:  WORD = FOREGROUND_GREEN or FOREGROUND_BLUE or FOREGROUND_INTENSITY;
 
 function OpenConsole: Boolean;
 procedure CloseConsole;
@@ -35,6 +36,8 @@ procedure DisableMenuButtons;
 procedure OutputLogo(colored: Boolean = false);
 procedure OutputAYRegister;
 procedure OutputAYMID(mask,msb:uint16; data:PArray0OfByte; length:integer);
+procedure SetDataColor(color: WORD = FOREGROUND_GREEN or FOREGROUND_BLUE or FOREGROUND_INTENSITY);
+procedure SetDataColorByTag(tag: integer);
 
 implementation
 
@@ -54,6 +57,29 @@ procedure GreenColor(force: Boolean = False);
 begin
   if (not colored or force) and (hOut <> INVALID_HANDLE_VALUE) then begin
     SetConsoleTextAttribute( hOut, FOREGROUND_GREEN or FOREGROUND_INTENSITY);
+    colored := True;
+  end;
+end;
+
+procedure SetDataColor(color: WORD = FOREGROUND_GREEN or FOREGROUND_BLUE or FOREGROUND_INTENSITY);
+begin
+  dataColor := color;
+end;
+
+procedure SetDataColorByTag(tag: integer);
+begin
+  case tag of
+    0: SetDataColor(FOREGROUND_GREEN or FOREGROUND_BLUE  or FOREGROUND_INTENSITY);  // AQUA
+    1: SetDataColor(FOREGROUND_GREEN                     or FOREGROUND_INTENSITY);  // GREEN
+    2: SetDataColor(FOREGROUND_GREEN or FOREGROUND_RED   or FOREGROUND_INTENSITY);  // YELLOW
+    3: SetDataColor(FOREGROUND_RED   or FOREGROUND_BLUE  or FOREGROUND_INTENSITY);  // PINK
+  end;
+end;
+
+procedure UpdateDataColor(force: Boolean = False);
+begin
+  if (not colored or force) and (hOut <> INVALID_HANDLE_VALUE) then begin
+    SetConsoleTextAttribute( hOut, dataColor);
     colored := True;
   end;
 end;
@@ -313,7 +339,7 @@ begin
 
     Write('        ');
 
-    GreenColor;
+    UpdateDataColor;
 
     if length > 0 then Write(IntToHex(data[6]) + ' ');
     if length > 1 then Write(IntToHex(data[7]) + ' ');

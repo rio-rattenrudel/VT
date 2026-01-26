@@ -23,7 +23,7 @@ uses
  {$ENDIF Windows}
  SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
  StdCtrls, ComCtrls, ExtCtrls, Buttons, Grids, digsound, AY,
- LCLProc, TypInfo;
+ LCLProc, TypInfo, guitypes;
 
 type
  TVTFont = record
@@ -54,6 +54,7 @@ type
    SamAsNote, OrnAsNote, TracksHint, SamHint, OrnHint, SamOrnHLines: boolean;
    NotWarnUndo, LMBToDraw: boolean;
    UseAYMIDHardware, UseAYMIDConsole: boolean;
+   AymidColorTag: integer;
    lastNumberOfBuffers,lastSampleRate,lastBufLen_ms: integer;
    lastV: DWORD;
    Lang: string;
@@ -104,6 +105,7 @@ type
    GBInitParams: TGroupBox;
    ChanSel: TGroupBox;
    GBLang: TGroupBox;
+   Label1: TLabel;
    LbNoteTbl: TLabel;
    LbAutStpVal: TLabel;
    LbTestsFont: TLabel;
@@ -160,6 +162,10 @@ type
    ButCancel: TButton;
    EdNumLines: TEdit;
    KeysTab: TTabSheet;
+   AymidColorButton1: TSpeedButton;
+   AymidColorButton0: TSpeedButton;
+   AymidColorButton2: TSpeedButton;
+   AymidColorButton3: TSpeedButton;
    UDNumLines: TUpDown;
    LbNumLines: TLabel;
    FontDialog1: TFontDialog;
@@ -228,6 +234,7 @@ type
    procedure FormCreate(Sender: TObject);
    procedure LoadLanguages;
    procedure SBSRAYby8Click(Sender: TObject);
+   procedure AymidColorButtonsClick(Sender: TObject);
    procedure UpdateLang;
    function Get_Language: string;
    procedure IntSelClick(Sender: TObject);
@@ -965,6 +972,14 @@ procedure TOptionsDlg.SBSRAYby8Click(Sender: TObject);
 begin
  Set_Sample_Rate(round(VTOptions.AY_Freq / 8));
  SetSRs;
+end;
+
+procedure TOptionsDlg.AymidColorButtonsClick(Sender: TObject);
+begin
+ (Sender as TSpeedButton).Down := True;
+
+ VTOptions.AymidColorTag := (Sender as TSpeedButton).Tag;
+ SetDataColorByTag(VTOptions.AymidColorTag);
 end;
 
 procedure TOptionsDlg.IntSelClick(Sender: TObject);
