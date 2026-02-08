@@ -4,6 +4,8 @@ This is part of Vortex Tracker II project
 Author Sergey Bulba
 E-mail: svbulba@gmail.com
 Support page: http://bulba.untergrund.net/
+
+note: 2026 AYMID additions by rio rattenrudel
 }
 
 unit Main;
@@ -836,7 +838,6 @@ begin
      ToggleMidiKbd.Checked := False;
     end;
   end;
- AYMIDDevice := MidiIn_DevNum + 1;
  UpdateToggleMidiKbdHint;
 end;
 
@@ -2570,6 +2571,11 @@ begin
    end;
    CBAymidProtocol.Checked := UseAYMIDHardware;
    CBAymidConsole.Checked := UseAYMIDConsole;
+
+   {$IFDEF Windows}
+   cbMODevice.ItemIndex := integer(AYMIDDevice) + 1;
+   {$ENDIF Windows}
+
    case AymidColorTag of
      0: AymidColorButton0.Down := True;
      1: AymidColorButton1.Down := True;
@@ -3229,9 +3235,6 @@ begin
   begin
    ToggleMidiKbd.Tag := MidiIn_DevNum;
 
-   if VTOptions.UseAYMIDHardware then
-    AYMIDDevice := ToggleMidiKbd.Tag + 1;
-
    if ToggleMidiKbd.Tag < 0 then //prevent "deadlock" when manually switching devices
      ToggleMidiKbd.Tag := 0;
   end;
@@ -3468,6 +3471,9 @@ procedure CatchAndResetPlaying;
 begin
  digsoundloop_catch;
  ResetPlaying;
+
+ if VTOptions.UseAYMIDHardware then
+  aymidthread_stop;
 end;
 
 procedure TMainForm.SetIntFreqEx(f: integer);
@@ -3592,8 +3598,12 @@ begin
      if s <> '' then
        SaveStr('MidiKbdName', s);
      SaveDW('MidiKbdVol', Ord(ToggleMidiVol.Checked));
+     {$IFDEF Windows}
+     SaveDW('AYMIDDevice', AYMIDDevice);
+     SaveStr('AYMIDDeviceName', GetAYMIDDeviceName(AYMIDDevice));
      SaveDW('UseAYMIDHardware', Ord(UseAYMIDHardware));
      SaveDW('UseAYMIDConsole', Ord(UseAYMIDConsole));
+     {$ENDIF Windows}
      SaveDW('AymidColorTag', AymidColorTag);
      SaveStr('ModulesFolder', OpenDialogVTM.InitialDir);
      SaveStr('PatternsFolder', PatternsFolder);
@@ -3749,18 +3759,10 @@ end;
 procedure TMainForm.HandleSysVolume();
 {$ifdef Windows}
 var
- v: DWORD;
-
+  v: DWORD;
 begin
- if VTOptions.UseAYMIDHardware then begin
-   v := digsound_getvolume(digsoundDevice);
-   if v <> 0 then VTOptions.lastV := v;
-   v := 0;
- end else begin
-  if VTOptions.lastV = 0 then
-    v := digsound_getvolume(digsoundDevice)
-  else v := VTOptions.lastV;
- end;
+ if VTOptions.UseAYMIDHardware then v := 0
+ else v := $FFFFFFFF;
 
  digsound_setvolume(digsoundDevice, v);
 {$endif}
@@ -3908,12 +3910,16 @@ begin
        MidiIn_DevName(s);
      if GetDW('MidiKbdVol', v) then
        ToggleMidiVol.Checked := v <> 0;
+     {$IFDEF Windows}
+     if not GetStr('AYMIDDeviceName', s) then s := '';
+     if GetDW('AYMIDDevice', v) then SetAYMIDDevice(v, s);
      if GetDW('UseAYMIDHardware', v) then
       UseAYMIDHardware := v <> 0;
      if GetDW('UseAYMIDConsole', v) then begin
       UseAYMIDConsole := v <> 0;
       if UseAYMIDConsole then OpenConsole;
      end;
+     {$ENDIF Windows}
      if GetDW('AymidColorTag', v) then begin
        if v <> AymidColorTag then begin
         SetDataColorByTag(v);

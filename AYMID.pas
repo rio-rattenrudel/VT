@@ -31,6 +31,8 @@ var
   running: Boolean = false;
 
 procedure AYMIDEnumDevices(cb:TComboBox);
+function GetAYMIDDeviceName(MD: integer): string;
+procedure SetAYMIDDevice(MD: integer; NM: string);
 procedure aymidthread_start;
 procedure aymidthread_stop;
 function aymidthread_active:boolean;
@@ -84,6 +86,37 @@ begin
       cb.Items.Add('Unknown MIDI device');
 end;
 
+function GetAYMIDDeviceName(MD: integer): string;
+var
+  outcaps: MIDIOUTCAPS;
+
+begin
+  Result := '';
+  if midiOutGetDevCaps(MD, @outcaps, sizeof(outcaps)) = MMSYSERR_NOERROR then
+    Result := UTF8Encode(WideString(outcaps.szPname));
+end;
+
+procedure SetAYMIDDevice(MD: integer; NM: string);
+var
+  l, j: integer;
+
+begin
+  if MD < -1 then exit;
+
+  l := integer(midiOutGetNumDevs);
+  if MD >= l - 1 then exit;
+
+  if (NM <> '') and (GetAYMIDDeviceName(MD) <> NM) then begin
+    j := 0;
+    while (j < l) and (GetAYMIDDeviceName(j) <> NM) do Inc(j);
+    if j < l then MD := j - 1
+    else          MD := -1;
+  end;
+
+  if AYMIDDevice <> DWORD(MD) then
+    AYMIDDevice := MD;
+end;
+
 procedure output_sysex_data(init:byte;data:PArray0OfByte;length:integer);
 var
   mh: MIDIHDR;
@@ -118,7 +151,6 @@ end;
 
 procedure Sendstop;
 var
-  i: BYTE;
   stop: array [0..2] of BYTE = ($2E, $4D, $F7); // ident, stop cmd
 
 begin

@@ -5,7 +5,7 @@ Author Sergey Bulba
 E-mail: svbulba@gmail.com
 Support page: http://bulba.untergrund.net/
 
-note: 2025 AYMID additions by rio rattenrudel
+note: 2026 AYMID additions by rio rattenrudel
 }
 
 unit ChildWin;
@@ -7133,7 +7133,7 @@ begin
  if not IsPlaying then
    digsoundthread_start2(False); //silent (without error message showing)
    if VTOptions.UseAYMIDHardware then begin
-    if VTOptions.UseAYMIDConsole then OutputLogo;
+    if VTOptions.UseAYMIDConsole then OutputLogo(false, false, true);
     aymidthread_start;
    end;
 end;

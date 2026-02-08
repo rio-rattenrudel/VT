@@ -1628,6 +1628,27 @@ object OptionsDlg: TOptionsDlg
           OnChange = CBAymidConsoleChange
         end
       end
+      object cbMODevice: TComboBox
+        AnchorSideRight.Side = asrBottom
+        Left = 128
+        Height = 21
+        Top = 220
+        Width = 321
+        Anchors = [akTop, akLeft, akRight]
+        BorderSpacing.Left = 8
+        BorderSpacing.Top = 4
+        BorderSpacing.Right = 8
+        BorderSpacing.Bottom = 8
+        ItemHeight = 13
+        ItemIndex = 0
+        Items.Strings = (
+          'MIDI Mapper'
+        )
+        Style = csDropDownList
+        TabOrder = 7
+        Text = 'MIDI Mapper'
+        OnChange = cbMODeviceChange
+      end
     end
     object KeysTab: TTabSheet
       Caption = 'Keys'

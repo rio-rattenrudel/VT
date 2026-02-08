@@ -2,7 +2,7 @@
 AYMIDconsole.pas - AYMID console for displaying nerdy outputs
 -------------------------------------------------------------
 
-(c)2026 by rio rattenrudel
+(c)2026 by rio rattenrudel - VT II version
 
   The sound chip frequency of AY_Emul must match
   your hardware (1.77 / 2 MHz), which can be set
@@ -33,7 +33,7 @@ var
 function OpenConsole: Boolean;
 procedure CloseConsole;
 procedure DisableMenuButtons;
-procedure OutputLogo(colored: Boolean = false);
+procedure OutputLogo(colored: Boolean = false; validatePosition: Boolean = true; forceEmptyLine: Boolean = false);
 procedure OutputAYRegister;
 procedure OutputAYMID(mask,msb:uint16; data:PArray0OfByte; length:integer);
 procedure SetDataColor(color: WORD = FOREGROUND_GREEN or FOREGROUND_BLUE or FOREGROUND_INTENSITY);
@@ -100,8 +100,21 @@ begin
   end;
 end;
 
-procedure OutputLogo(colored: Boolean = false);
+procedure OutputLogo(colored: Boolean = false; validatePosition: Boolean = true; forceEmptyLine: Boolean = false);
 begin
+  if (forceEmptyLine = true) or 
+     ((validatePosition = true) and
+      (PlaybackBufferMaker.Players <> nil) and 
+      (Length(PlaybackBufferMaker.Players) > 0) and (
+        (PlaybackBufferMaker.Players[0]^.CurrentLine > 2) or
+        (PlaybackBufferMaker.Players[0]^.CurrentPosition <> 0)
+      )) then begin
+
+      // empty line
+      WriteLn();
+      Exit;
+    end;
+
   if colored then begin
     WriteLn('');
     Color($C);Write('   _____');Color($D);Write(' _____.___.');Color($B);Write('  _____  ');Color($A);Write('.___');Color($E);Write('________');RestoreColor;Write('             _____ _____.___.________  '+#13#10);
@@ -129,17 +142,15 @@ procedure OutputInstruction;
 begin
   WriteLn('  Please choose your right midi equip and port!');
   WriteLn('');
-  WriteLn('  The sound chip frequency of AY_Emul must match your hardware (1.77 / 2Mhz).');
+  WriteLn('  The sound chip frequency of VT II must match your hardware (1.77 / 2Mhz).');
   WriteLn('  While sample rate and buffer length are set automatically,');
-  WriteLn('  the number of buffers can be adjusted as needed (recommended: 8).');
+  WriteLn('  the number of buffers can be adjusted as needed (recommended: 3).');
+  WriteLn('  Set the number of buffers as low as possible to avoid any visual delays!');
   WriteLn('');
   WriteLn('  AYMID is based on the ASID sysex data protocol from Elektron.');
   WriteLn('  Two masks, two MSBs and 14 registers are enuff!');
   WriteLn('');
-  WriteLn('  ~~ rio rattenrudel ~~                                        V0.1  10/2023  ');
-  WriteLn('                                                               V0.2  04/2024  ');
-  WriteLn('                                                               V0.3  09/2025  ');
-  WriteLn('                                                               V1.0  10/2025  ');
+  WriteLn('  ~~ rio rattenrudel ~~                                        V1.0  01/2026  ');
 end;
 
 function OpenConsole: Boolean;

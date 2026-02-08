@@ -5,7 +5,7 @@ Author Sergey Bulba
 E-mail: svbulba@gmail.com
 Support page: http://bulba.untergrund.net/
 
-note: 2025 AYMID additions by rio rattenrudel
+note: 2026 AYMID additions by rio rattenrudel
 }
 
 unit options;
@@ -56,7 +56,6 @@ type
    UseAYMIDHardware, UseAYMIDConsole: boolean;
    AymidColorTag: integer;
    lastNumberOfBuffers,lastSampleRate,lastBufLen_ms: integer;
-   lastV: DWORD;
    Lang: string;
    {$IFDEF Windows}
    Priority: dword;
@@ -83,6 +82,7 @@ type
    CBDecTrLines: TCheckBox;
    CBDecNoise: TCheckBox;
    CBEnvAsNote: TCheckBox;
+   cbMODevice: TComboBox;
    CBTracksHint: TCheckBox;
    CBSamAsNote: TCheckBox;
    CBRecalcEnv: TCheckBox;
@@ -209,6 +209,7 @@ type
    procedure CBcaChange(Sender: TObject);
    procedure CBLangEditingDone(Sender: TObject);
    procedure CBLMBtoDrawChange(Sender: TObject);
+   procedure cbMODeviceChange(Sender: TObject);
    procedure CBOrnAsNoteChange(Sender: TObject);
    procedure CBOrnHintChange(Sender: TObject);
    procedure CBSamAsNoteChange(Sender: TObject);
@@ -354,7 +355,7 @@ implementation
 
 uses
  Main, digsoundcode, digsoundbuf, trfuncs, keys, catchshortcut, nkeypeeker,
- Languages, LCLTranslator, LResources, AYMID, AYMIDconsole;
+ Languages, LCLTranslator, LResources{$IFDEF Windows}, AYMID, AYMIDconsole{$ENDIF Windows};
 
  {$R *.lfm}
 
@@ -754,8 +755,8 @@ begin
   VTOptions.lastNumberOfBuffers := NumberOfBuffers;
   VTOptions.lastSampleRate := VTOptions.SampleRate;
 
-  if NumberOfBuffers < 8 then
-   NumberOfBuffers := 7;
+  if NumberOfBuffers < 3 then
+   NumberOfBuffers := 3;
 
   SetBuffers(20, NumberOfBuffers);
 
@@ -774,6 +775,14 @@ begin
   SR.Enabled := True;
   TBBufLen.Enabled := True;
  end;
+
+ LBNum.Caption := IntToStr(NumberOfBuffers);
+ LbBufLn.Caption := IntToStr(BufLen_ms) + ' ' + Mes_ms;
+ LbTotLn.Caption := IntToStr(BufLen_ms * NumberOfBuffers) + ' ' + Mes_ms;
+ LBChg.Caption := LbTotLn.Caption;
+
+ TBBufNum.Position := NumberOfBuffers;
+ TBBufLen.Position := BufLen_ms;
 
  MainForm.HandleSysVolume();
  PlaybackBufferMaker.SetSynthesizer;
@@ -853,6 +862,13 @@ begin
  VTOptions.LMBToDraw := CBLMBtoDraw.Checked;
 end;
 
+procedure TOptionsDlg.cbMODeviceChange(Sender: TObject);
+begin
+ {$IFDEF Windows}
+ AYMIDDevice := cbMODevice.ItemIndex - 1;
+ {$ENDIF Windows}
+end;
+
 procedure TOptionsDlg.CBOrnAsNoteChange(Sender: TObject);
 begin
  VTOptions.OrnAsNote := CBOrnAsNote.Checked;
@@ -922,6 +938,9 @@ begin
  UDAutStpVal.Max := MaxPatLen;
  UDAutStpVal.Min := -MaxPatLen;
  LoadLanguages;
+ {$IFDEF Windows}
+ AYMIDEnumDevices(cbMODevice);
+ {$ENDIF Windows}
 end;
 
 procedure TOptionsDlg.LoadLanguages;
