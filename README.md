@@ -13,6 +13,14 @@ Win32: Lazarus 3.8, FPC 3.2.2, x86_64-win64-win32/win64 (cross-i386-win32)
 Win64: Lazarus 3.8, FPC 3.2.2, x86_64-win64-win32/win64
 ```
 
+## AYMID Support
+
+Contains the AYMID console + protocol for transferring song data in real time via midi 1.0, which is supported, for example, by Twisted Electrons' AY3 hardware device from version 4 onwards.
+
+rio rattenrudel
+
+27 of January 2026 
+
 # History
 
 The Vortex Tracker II idea is based on the Vortex Tracker. I and Roman
